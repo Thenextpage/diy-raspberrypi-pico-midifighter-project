@@ -75,10 +75,6 @@ left_state = None
 right_state = None
 midi_state = None
  
-#  coordinates for navigating main GUI
-select_x = [0, 32, 64, 96]
-select_y = [0, 32, 64, 96]
- 
 #  y coordinate for 5-way switch navigation
 y_pos = 0
 #  x coordinate for 5-way switch navigation
@@ -106,28 +102,9 @@ switch_coordinates = [(0, 0), (1, 0), (2, 0), (3, 0), (0, 1), (1, 1), (2, 1), (3
 #  array of default MIDI notes
 midi_notes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75]
  
-#  show main display GUI
-display.show(splash)
- 
 while True:
  
-    #  debouncing for 5-way switch positions
-    if up.value and up_state == "pressed":
-        print("Button pressed.")
-        up_state = None
-    if down.value and down_state == "pressed":
-        print("Button pressed.")
-        down_state = None
-    if left.value and left_state == "pressed":
-        print("Button pressed.")
-        left_state = None
-    if right.value and right_state == "pressed":
-        print("Button pressed.")
-        right_state = None
-    if select.value and select_state == "pressed":
-        print("Button pressed.")
-        select_state = None
- 
+    
     #  MIDI input
     for i in range(16):
         buttons = note_buttons[i]
