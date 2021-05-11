@@ -64,22 +64,7 @@ right = digitalio.DigitalInOut(board.GP2)
 #  array for 5-way switch
 joystick = [select, up, down, left, right]
  
-for joy in joystick:
-    joy.direction = digitalio.Direction.INPUT
-    joy.pull = digitalio.Pull.UP
-#  states for 5-way switch
-select_state = None
-up_state = None
-down_state = None
-left_state = None
-right_state = None
-midi_state = None
  
-#  y coordinate for 5-way switch navigation
-y_pos = 0
-#  x coordinate for 5-way switch navigation
-x_pos = 0
-sub_state = False
 #  default midi number
 midi_num = 60
 #  default MIDI button
@@ -92,12 +77,6 @@ led_check = None
 clock = time.monotonic()
  
 #  coordinates for tracking location of 5-way switch
-up_scroll = 0
-down_scroll = 0
-left_scroll = 0
-right_scroll = 0
-switch_coordinates = [(0, 0), (1, 0), (2, 0), (3, 0), (0, 1), (1, 1), (2, 1), (3, 1), (0, 2),
-            (1, 2), (2, 2), (3, 2), (0, 3), (1, 3), (2, 3), (3, 3)]
  
 #  array of default MIDI notes
 midi_notes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75]
@@ -120,124 +99,9 @@ while True:
             midi.send(NoteOff(midi_notes[i], 120))
             note_states[i] = False
             leds[i].value = False
- 
-    #  if we're on the main GUI page
-    if not sub_state:
-        #  if you press up on the 5-way switch...
-        if not up.value and up_state is None:
-            up_state = "pressed"
-            #  track the switch's position
-            up_scroll -= 1
-            if up_scroll < 0:
-                up_scroll = 3
-            y_pos = up_scroll
-            down_scroll = up_scroll
-        #  if you press down on the 5-way switch...
-        if not down.value and down_state is None:
-            down_state = "pressed"
-            #  track the switch's position
-            down_scroll += 1
-            if down_scroll > 3:
-                down_scroll = 0
-            y_pos = down_scroll
-            up_scroll = down_scroll
-        #  if you press left on the 5-way switch...
-        if not left.value and left_state is None:
-            # print("scroll", down_scroll)
-            left_state = "pressed"
-            #  track the switch's position
-            left_scroll -= 1
-            if left_scroll < 0:
-                left_scroll = 3
-            x_pos = left_scroll
-            right_scroll = left_scroll
-        #  if you press right on the 5-way switch...
-        if not right.value and right_state is None:
-            # print("scroll", down_scroll)
-            right_state = "pressed"
-            #  track the switch's position
-            right_scroll += 1
-            if right_scroll > 3:
-                right_scroll = 0
-            x_pos = right_scroll
-            left_scroll = right_scroll
- 
-        #  update square's position on the GUI
-        rect.y = select_y[y_pos]
-        rect.x = select_x[x_pos]
- 
-        #  update the currently highlighted button on the GUI
-        for coords in switch_coordinates:
-            if x_pos == coords[0] and y_pos == coords[1]:
-                button_pos = switch_coordinates.index(coords)
-                #  print(button_pos)
-        button_num = text_labels[button_pos].text
- 
-        #  if you press select on the 5-way switch...
-        if not select.value and select_state is None:
-            select_state = "pressed"
-            #  grab the selected button's MIDI note
-            midi_num = int(button_num)
-            #  change into the secondary GUI menu
-            sub_state = True
- 
-    #  if an arcade button is selected to change the MIDI note...
-    if sub_state:
-        #  display the secondary GUI menu
-        display.show(big_splash)
-        #  display the selected button's MIDI note
-        big_text.text = str(midi_num)
- 
-        #  blink the selected button's LED without pausing the loop
-        if (time.monotonic() > (clock + 1)) and led_check is None:
-            leds[button_pos].value = True
-            led_check = True
-            clock = time.monotonic()
-        if (time.monotonic() > (clock + 1)) and led_check is True:
-            leds[button_pos].value = False
-            led_check = None
-            clock = time.monotonic()
- 
-        #  blocks the MIDI number from being set above 128
-        if midi_num >= 128:
-            midi_num = 128
-        #  blocks the MIDI number from being set below 0
-        if midi_num <= 0:
-            midi_num = 0
- 
-        #  if you press right on the 5-way switch...
-        if not right.value and right_state is None:
-            #  increase the MIDI number
-            midi_num += 1
-            right_state = "pressed"
-        #  if you press up on the 5-way switch...
-        if not up.value and up_state is None:
-            #  increase the MIDI number
-            midi_num += 1
-            up_state = "pressed"
-        #  if you press left on the 5-way switch...
-        if not left.value and left_state is None:
-            #  decrease the MIDI number
-            midi_num -= 1
-            left_state = "pressed"
-        #  if you press down on the 5-way switch...
-        if not down.value and down_state is None:
-            #  decrease the MIDI number
-            midi_num -= 1
-            down_state = "pressed"
- 
+            
+            
         #  update arcade button's MIDI note
         #  allows you to check note while you're adjusting it
         midi_notes[button_pos] = midi_num
  
-        #  if you press select on the 5-way switch...
-        if not select.value and select_state is None:
-            select_state = "pressed"
-            #  change back to main menu mode
-            sub_state = False
-            #  update new MIDI number text label
-            text_labels[button_pos].text = str(midi_num)
-            #  show main GUI display
-            display.show(splash)
-            #  turn off blinking LED
-            leds[button_pos].value = False
