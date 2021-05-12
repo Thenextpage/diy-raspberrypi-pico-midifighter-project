@@ -9,19 +9,20 @@ import usb_midi
 import adafruit_midi
 from adafruit_midi.note_on          import NoteOn
 from adafruit_midi.note_off         import NoteOff
- 
-displayio.release_displays()
- 
+from simpleio import map_range
+from analogio import AnalogIn
+from digitalio import DigitalInOut, Direction
+import usb_midi
+import adafruit_midi  # MIDI protocol encoder/decoder library
+from adafruit_midi.control_change import ControlChange 
 
 #  MIDI setup as MIDI out device
 midi = adafruit_midi.MIDI(midi_out=usb_midi.ports[1], out_channel=0)
-
  
- 
-#  button pins, all pins in order skipping GP15
-note_pins = [board.GP7, board.GP8, board.GP9, board.GP10, board.GP11,
+#  button pins, all pins in order skipping GP15 (Note that GP 6 is being used instead of 26 for analog input)
+note_pins = [board.GP6, board.GP7, board.GP8, board.GP9, board.GP10, board.GP11,
              board.GP12, board.GP13, board.GP14, board.GP16, board.GP17,
-             board.GP18, board.GP19, board.GP20, board.GP21, board.GP22, board.GP26]
+             board.GP18, board.GP19, board.GP20, board.GP21, board.GP22]
  
 note_buttons = []
  
