@@ -1,10 +1,7 @@
 import time
 import board
-
 import busio
 import digitalio
-
-
 import usb_midi
 import adafruit_midi
 from adafruit_midi.note_on          import NoteOn
@@ -15,6 +12,30 @@ from digitalio import DigitalInOut, Direction
 import usb_midi
 import adafruit_midi  # MIDI protocol encoder/decoder library
 from adafruit_midi.control_change import ControlChange 
+
+#setup analog joystick and slider inputs
+xAxis = AnalogIn(board.A1)
+yAxis = AnalogIn(board.A0)
+sAxis = AnalogIn(board.A2)
+
+cc_value=[0,0]
+
+def range_index(ctl, ctrl_max, old_idx, offset):
+    if (ctl + offset > 65535) or (ctl + offset < 0):
+        offset = 0
+    idx = int(map_range((ctl + offset) & 0xFF00, 1200, 65500, 0, ctrl_max))
+    if idx != old_idx:  # if index changed, adjust hysteresis offset
+        # offset is 25% of the control slice (65536/ctrl_max)
+        offset = int(
+            0.25 * sign(idx - old_idx) * (65535 / ctrl_max)
+        )  # edit 0.25 to adjust slices
+    return idx, offset
+
+
+in_min,in_max,out_min,out_max = (0, 65000, -10, 10)
+
+filter_joystick_deadzone = lambda x: round(((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min),2 ) if abs(x-33500) > 1000 else 0
+   
 
 #  MIDI setup as MIDI out device
 midi = adafruit_midi.MIDI(midi_out=usb_midi.ports[1], out_channel=0)
@@ -54,17 +75,6 @@ note_states = [note0_pressed, note1_pressed, note2_pressed, note3_pressed,
                note4_pressed, note5_pressed, note6_pressed, note7_pressed,
                note8_pressed, note9_pressed, note10_pressed, note11_pressed,
                note12_pressed, note13_pressed, note14_pressed, note15_pressed]
-
-#  pins for 5-way switch
-select = digitalio.DigitalInOut(board.GP6)
-up = digitalio.DigitalInOut(board.GP5)
-down = digitalio.DigitalInOut(board.GP4)
-left = digitalio.DigitalInOut(board.GP3)
-right = digitalio.DigitalInOut(board.GP2)
-
-#  array for 5-way switch
-joystick = [select, up, down, left, right]
- 
  
 #  default midi number
 midi_num = 60
@@ -72,13 +82,9 @@ midi_num = 60
 button_num = 0
 #  default MIDI button position
 button_pos = 0
-#  check for blinking LED
-led_check = None
 #  time.monotonic() device
 clock = time.monotonic()
- 
-#  coordinates for tracking location of 5-way switch
- 
+
 #  array of default MIDI notes
 midi_notes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75]
  
@@ -93,14 +99,18 @@ while True:
             #  send the MIDI note and light up the LED
             midi.send(NoteOn(midi_notes[i], 120))
             note_states[i] = True
-            leds[i].value = True
         #  if the button is released...
         if buttons.value and note_states[i] is True:
             #  stop sending the MIDI note and turn off the LED
             midi.send(NoteOff(midi_notes[i], 120))
             note_states[i] = False
-            leds[i].value = False
-            
+        
+        #read knob values
+        slidervalue = range_index(sAxis.value,128,cc_value[0],cc_value[1],)
+            if cc_value != last_cc_value:  # only send if it changed
+            # Form a MIDI CC message and send it:
+                midi.send(ControlChange(9, cc_value[0])
+            last_cc_value = cc_value
             
         #  update arcade button's MIDI note
         #  allows you to check note while you're adjusting it
