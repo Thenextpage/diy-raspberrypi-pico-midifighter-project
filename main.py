@@ -112,7 +112,8 @@ while True:
                 midi.send(ControlChange(9, cc_value[0])
             last_cc_value = cc_value
             
+                          
         #  update arcade button's MIDI note
         #  allows you to check note while you're adjusting it
-        midi_notes[button_pos] = midi_num
+  
  
