@@ -9,7 +9,6 @@ from adafruit_midi.note_off         import NoteOff
 from simpleio import map_range
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction
-import usb_midi
 import adafruit_midi  # MIDI protocol encoder/decoder library
 from adafruit_midi.control_change import ControlChange 
 
@@ -19,6 +18,7 @@ yAxis = AnalogIn(board.A0)
 sAxis = AnalogIn(board.A2)
 
 cc_value=[0,0]
+last_cc_value=[0,0]
 
 def range_index(ctl, ctrl_max, old_idx, offset):
     if (ctl + offset > 65535) or (ctl + offset < 0):
@@ -31,6 +31,11 @@ def range_index(ctl, ctrl_max, old_idx, offset):
         )  # edit 0.25 to adjust slices
     return idx, offset
 
+def sign(x):  # determine the sign of x
+    if x >= 0:
+        return 1
+    else:
+        return -1
 
 in_min,in_max,out_min,out_max = (0, 65000, -10, 10)
 
@@ -106,14 +111,12 @@ while True:
             note_states[i] = False
         
         #read knob values
-        slidervalue = range_index(sAxis.value,128,cc_value[0],cc_value[1],)
-            if cc_value != last_cc_value:  # only send if it changed
+        cc_value = range_index(sAxis.value,128,cc_value[0],cc_value[1],)
+        if cc_value[0] != last_cc_value[0]:  # only send if it changed
             # Form a MIDI CC message and send it:
-                midi.send(ControlChange(9, cc_value[0])
+            midi.send(ControlChange(1,cc_value[0]),9)
             last_cc_value = cc_value
             
                           
         #  update arcade button's MIDI note
         #  allows you to check note while you're adjusting it
-  
- 
