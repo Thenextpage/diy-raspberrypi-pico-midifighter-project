@@ -11,6 +11,8 @@ from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction
 import adafruit_midi  # MIDI protocol encoder/decoder library
 from adafruit_midi.control_change import ControlChange 
+import math
+from adafruit_circuitplayground import cp
 
 #setup analog joystick and slider inputs
 xAxis = AnalogIn(board.A1)
@@ -68,10 +70,12 @@ note_states = [False,False,False,False,False,False,False,False,False,False,False
 clock = time.monotonic()
 
 #  array of default MIDI notes
+
 midi_notes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75]
 midi_range = 0
 xswitch=0
 yswitch=0
+cc_list=[0,0,0,0,0,0,0,0,0,0]
 
 while True:
  
@@ -90,10 +94,13 @@ while True:
             
         #read knob values
     cc_value = range_index(sAxis.value,128,cc_value[0],cc_value[1])
+    cc_list.append(cc_value[0])
+    cc_list.pop(0)
+    avgcc_val = round(sum(cc_list))/10)
 
-    if cc_value[0] != last_cc_value[0]:  # only send if it changed
+    if avgcc_val != last_cc_value[0]:  # only send if it changed
         # Form a MIDI CC message and send it:
-        midi.send(ControlChange(1,cc_value[0]))
+        midi.send(ControlChange(1,avgcc_val))
         last_cc_value = cc_value
         
     x_offset = filter_joystick_deadzone(xAxis.value) * -1 #Invert axis
