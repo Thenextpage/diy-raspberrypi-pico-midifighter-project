@@ -9,16 +9,23 @@ from adafruit_midi.note_off         import NoteOff
 from simpleio import map_range
 from analogio import AnalogIn
 from digitalio import DigitalInOut, Direction
-import adafruit_midi  # MIDI protocol encoder/decoder library
 from adafruit_midi.control_change import ControlChange 
 import math
-from adafruit_circuitplayground import cp
+import adafruit_rgbled
 
 #setup analog joystick and slider inputs
 xAxis = AnalogIn(board.A1)
 yAxis = AnalogIn(board.A0)
 sAxis = AnalogIn(board.A2)
+led=adafruit_rgbled.RGBLED(board.GP0,board.GP1,board.GP2)
+ledw = digitalio.DigitalInOut(board.GP3)
+ledw.direction = digitalio.Direction.OUTPUT
 
+ledcolor=[[255,0,0],[255,80,0],[255,255,0],[0,255,0],[0,0,255],[0,100,255],[100,0,255],[255,255,255]]
+ledwcolor=[[255,0,0],[255,80,0],[255,255,0],[0,255,0],[0,0,255],[0,100,255],[100,0,255],[255,255,255],[255,0,0],[255,80,0],[255,255,0],[0,255,0],[0,0,255],[0,100,255],[100,0,255],[255,255,255],[255,0,0],[255,80,0],[255,255,0]]
+ledx_number=0
+ledy_number=0
+ledw_number=0
 cc_value=[0,0]
 last_cc_value=[0,0]
 in_min,in_max,out_min,out_max = (0, 65000, -10, 10)
@@ -39,8 +46,9 @@ def sign(x):  # determine the sign of x
     else:
         return -1
 
-filter_joystick_deadzone = lambda x: round(((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min),1 ) if abs(x-33500) > 1000 else 0
-   
+filter_joystick_deadzone = lambda x: round(((x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min),1 ) if abs(x-33500) > 20000 else 0
+
+c_num=0
 #  MIDI setup as MIDI out device
 midi = adafruit_midi.MIDI(midi_out=usb_midi.ports[1], out_channel=0)
  
@@ -60,12 +68,7 @@ for pin in note_pins:
 #  note states
 note_states = [False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False]
  
-#  default midi number
-#midi_num = 60
-#  default MIDI button
-#button_num = 0
-#  default MIDI button position
-#button_pos = 0
+
 #  time.monotonic() device
 clock = time.monotonic()
 
@@ -75,10 +78,9 @@ midi_notes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75]
 midi_range = 0
 xswitch=0
 yswitch=0
-cc_list=[0,0,0,0,0,0,0,0,0,0]
+cc_list=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 while True:
- 
     
     #  MIDI input
     for i in range(16):
@@ -96,16 +98,18 @@ while True:
     cc_value = range_index(sAxis.value,128,cc_value[0],cc_value[1])
     cc_list.append(cc_value[0])
     cc_list.pop(0)
-    avgcc_val = round(sum(cc_list))/10)
-
+    avgcc_val = round(sum(cc_list)/30)
+    
     if avgcc_val != last_cc_value[0]:  # only send if it changed
         # Form a MIDI CC message and send it:
         midi.send(ControlChange(1,avgcc_val))
         last_cc_value = cc_value
         
-    x_offset = filter_joystick_deadzone(xAxis.value) * -1 #Invert axis
-    y_offset = filter_joystick_deadzone(yAxis.value)
-    if x_offset > 0.7:
+    x_offset = filter_joystick_deadzone(xAxis.value) * -1        
+    y_offset = filter_joystick_deadzone(yAxis.value)       #Invert axis
+
+
+    if x_offset > 6:
         if xswitch == 1 or midi_range>3:
             continue
         for y in range(16):
@@ -113,8 +117,13 @@ while True:
             note_states[y] = False
         midi_notes = [x+12 for x in midi_notes]
         midi_range+=1
+        print(midi_range)
+        ledx_number+=1
+        led.color=(ledcolor[ledx_number][0],ledcolor[ledx_number][1],ledcolor[ledx_number][2])
+
         xswitch = 1
-    elif x_offset < -0.7:
+        
+    if x_offset < -6:
         if xswitch == 1 or midi_range<-3:
             continue
         for y in range(16):
@@ -122,11 +131,51 @@ while True:
             note_states[y] = False
         midi_notes = [x-12 for x in midi_notes]
         midi_range-=1
+        print(midi_range)
+        ledx_number-=1
+        led.color=(ledcolor[ledx_number][0],ledcolor[ledx_number][1],ledcolor[ledx_number][2])
+
         xswitch = 1
-    else:
-        if xswitch==0:
-            continue
+                    
+    if -6<= x_offset <= 6:
         xswitch=0
-                      
+        if yswitch==0:
+            led.color=(0,0,0)
+    
+    if y_offset > 6:
+        if yswitch == 1 or c_num>15:
+            continue
+        for y in range(16):
+            midi.send(NoteOff(midi_notes[y], 120))
+            note_states[y] = False
+        c_num+=1
+        print(str(c_num)+'e')
+        ledy_number+=1
+        led.color=(ledwcolor[ledy_number][0],ledwcolor[ledy_number][1],ledwcolor[ledy_number][2])
+        ledw.value=True
+        yswitch = 1
+            
+    if y_offset < -6:
+        if yswitch == 1 or c_num<1:
+            continue
+        for y in range(16):
+            midi.send(NoteOff(midi_notes[y], 120))
+            note_states[y] = False
+        c_num-=1
+        print(str(c_num)+'e')#
+        ledy_number-=1
+        led.color=(ledwcolor[ledy_number][0],ledwcolor[ledy_number][1],ledwcolor[ledy_number][2])
+        ledw.value=True
+        yswitch = 1
+
+    if -6<= y_offset <= 6:
+        yswitch=0
+        if xswitch==0:
+            led.color=(0,0,0)
+        ledw.value=False
+    
+#     print(x_offset,y_offset)
+#     time.sleep(0.01)
+    
         #  update arcade button's MIDI note
         #  allows you to check note while you're adjusting it
