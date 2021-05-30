@@ -20,5 +20,5 @@ here are the links im referencing
   - 1 rgb led and a white led
   - liniar potentiometer for slider midi control
 
-> im currently in the making so its not done yet.
+> the skimatics will be like this
  
