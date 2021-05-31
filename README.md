@@ -21,4 +21,4 @@ here are the links im referencing
   - liniar potentiometer for slider midi control
 
 > the skimatics will be like this
- 
+  
