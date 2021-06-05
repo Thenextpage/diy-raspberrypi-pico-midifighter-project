@@ -22,3 +22,5 @@ here are the links im referencing
 
 > the skimatics will be like this
   
+## what it does
+not only this midi fighter controller has 16 arcade midi buttons, using a joystick you can shift an octave and reach all 128 keys. also by tilting the joystick horizontally you can change the midi channel, thus be able to change instruments. when tilting the joystick, an rgb led will light up as an indecation of the channel and the octave you are in
