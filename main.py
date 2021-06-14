@@ -22,7 +22,7 @@ ledw = digitalio.DigitalInOut(board.GP3)
 ledw.direction = digitalio.Direction.OUTPUT
 
 note_states = [False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False] #  note states
-midi_notes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75] #  array of default MIDI notes
+midi_notes = [36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51] #  array of default MIDI notes
 ledcolor=[[255,0,0],[255,80,0],[255,255,0],[0,255,0],[0,0,255],[0,100,255],[100,0,255],[255,255,255]]
 ledwcolor=[[255,0,0],[255,80,0],[255,255,0],[0,255,0],[0,0,255],[0,100,255],[100,0,255],[255,255,255],[255,0,0],
            [255,80,0],[255,255,0],[0,255,0],[0,0,255],[0,100,255],[100,0,255],[255,255,255],[255,0,0],[255,80,0]]
@@ -59,8 +59,7 @@ filter_joystick_deadzone = lambda x: round(((x - in_min) * (out_max - out_min) /
 midi = adafruit_midi.MIDI(midi_out=usb_midi.ports[1])
  
 #  button pins, all pins in order skipping GP15 (Note that GP 6 is being used instead of 26 for analog input)
-note_pins = [board.GP6, board.GP7, board.GP8, board.GP9, board.GP10, board.GP11, board.GP12, board.GP13,
-             board.GP14, board.GP16, board.GP17, board.GP18, board.GP19, board.GP20, board.GP21, board.GP22]
+note_pins = [board.GP19, board.GP20, board.GP21, board.GP22, board.GP14, board.GP16, board.GP17, board.GP18, board.GP10, board.GP11, board.GP12, board.GP13, board.GP6, board.GP7, board.GP8, board.GP9]
 note_buttons = []
  
 for pin in note_pins:
@@ -70,6 +69,17 @@ for pin in note_pins:
     note_buttons.append(note_pin)
 
 clock = time.monotonic() #  time.monotonic() device
+
+led.color=(255,0,0)
+time.sleep(0.3)
+led.color=(0,255,0)
+time.sleep(0.3)
+led.color=(0,0,255)
+time.sleep(0.3)
+ledw.value=True
+led.color=(0,0,0)
+time.sleep(0.3)
+ledw.value=False
 
 while True:   
     for i in range(16):    #  MIDI input
@@ -93,8 +103,8 @@ while True:
         midi.send(ControlChange(1,avgcc_val))
         last_cc_value = cc_value
         
-    x_offset = filter_joystick_deadzone(xAxis.value) * -1        
-    y_offset = filter_joystick_deadzone(yAxis.value)       #Invert axis
+    x_offset = filter_joystick_deadzone(xAxis.value)  *-1       
+    y_offset = filter_joystick_deadzone(yAxis.value)  *-1    #Invert axis
     
     if x_offset > 6:
         if xswitch == 1 or midi_range>3:
@@ -102,19 +112,19 @@ while True:
         for y in range(16):
             midi.send(NoteOff(midi_notes[y], 120))
             note_states[y] = False
-        midi_notes = [x+12 for x in midi_notes]
+        midi_notes = [x+16 for x in midi_notes]
         midi_range+=1
         ledx_number+=1
         led.color=(ledcolor[ledx_number][0],ledcolor[ledx_number][1],ledcolor[ledx_number][2])
         xswitch = 1
         
     if x_offset < -6:
-        if xswitch == 1 or midi_range<-3:
+        if xswitch == 1 or midi_range<-1:
             continue
         for y in range(16):
             midi.send(NoteOff(midi_notes[y], 120))
             note_states[y] = False
-        midi_notes = [x-12 for x in midi_notes]
+        midi_notes = [x-16 for x in midi_notes]
         midi_range-=1
         ledx_number-=1
         led.color=(ledcolor[ledx_number][0],ledcolor[ledx_number][1],ledcolor[ledx_number][2])
