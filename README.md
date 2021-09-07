@@ -17,6 +17,7 @@ here are the links im referencing
 This midi fighter controller has 16 arcade midi buttons and a slider. The slider mostly functions as a track change function, but you are free to change in you DAW.
 Also by using a joystick you can shift 16 notes up and down and reach all 128 keys. You just need to tilt the joystick vertically. 
 By tilting the joystick horizontally, you can change the midi channel, thus be able to change instruments that you play. 
+
 When tilting the joystick, an rgb led will light up as an indecation of the current octave position you are in. The base location will be lighted in red, and then orange, yellow, green, blue, light blue, purple and white. And it loops to red until it reaches it's limit. There are 7 midi positions, and 16 midi channels that you can explore. The white led on the right side of the rgb led lightens up when you are changing the channel, and the rgb indication works same as the octave does. 
 
 ![1_0_GIF_0](https://user-images.githubusercontent.com/30145956/132369124-7f9bae9c-7a06-486a-bec1-ac9cabf5ca52.gif)
