@@ -28,3 +28,10 @@ here are the links im referencing
   
 ## what it does
 not only this midi fighter controller has 16 arcade midi buttons, using a joystick you can shift an octave and reach all 128 keys. also by tilting the joystick horizontally you can change the midi channel, thus be able to change instruments. when tilting the joystick, an rgb led will light up as an indecation of the channel and the octave you are in. 
+
+## how to make this
+
+This is the schematic i didnt wire the rest of the buttons but it will be connected on the following remaining gpio.
+
+![Untitled Sketch_bb](https://user-images.githubusercontent.com/30145956/132359437-05dff6b0-a847-43bd-a257-40841fb6bcbd.png)
+
