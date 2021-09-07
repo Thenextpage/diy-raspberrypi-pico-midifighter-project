@@ -35,3 +35,9 @@ This is the schematic i didnt wire the rest of the buttons but it will be connec
 
 ![Untitled Sketch_bb](https://user-images.githubusercontent.com/30145956/132359437-05dff6b0-a847-43bd-a257-40841fb6bcbd.png)
 
+the case that i made looks like this. (I'll share the file, but in retrospect i should have located the bottom raspberry pi pico screws location to a different place.)
+
+[acrylic case.pdf](https://github.com/Thenextpage/diy-raspberrypi-pico-midifighter-project/files/7122417/4add7cef-6b07-41a8-b77b-67100d3bae9c.dwg-0001.pdf)
+![ef](https://user-images.githubusercontent.com/30145956/132366060-8b058fc0-c745-4bb4-a8cf-44fdc6c8b082.png)
+
+after you make like this and making the case, you can install the main code into the raspberry pi as a main.py, and  it will automatically works like a midi fighter after you plug the micro usb 
