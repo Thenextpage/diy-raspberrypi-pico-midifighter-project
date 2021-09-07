@@ -13,7 +13,7 @@ here are the links im referencing
 - for knob functions : https://www.notion.so/midi-3d7e1cd3b45641999254624df3f391de#fb3c65681f5e41579676120b0cb622f5
 - for joysticks : https://www.tomshardware.com/how-to/raspberry-pi-pico-joystick
 
-## what it does
+## What it does
 not only this midi fighter controller has 16 arcade midi buttons, using a joystick you can shift an octave and reach all 128 keys. also by tilting the joystick horizontally you can change the midi channel, thus be able to change instruments. when tilting the joystick, an rgb led will light up as an indecation of the channel and the octave you are in. 
 
 ![1_0_GIF_0](https://user-images.githubusercontent.com/30145956/132369124-7f9bae9c-7a06-486a-bec1-ac9cabf5ca52.gif)
@@ -44,6 +44,6 @@ after you make like this and making the case, you can install the main code into
 - neopixel.mpy
 - simpleio.mpy
   
-## development plans
+## Development plans
   
 I'm planning to utilize the joystick button press to enter the CC mode, which is the control change mode. Some DAWs like ableton will treat midi note signals and the control change signals differently, so it will give the user more control in performance.
