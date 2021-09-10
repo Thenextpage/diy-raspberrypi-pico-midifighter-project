@@ -10,7 +10,7 @@ The project code mainly using the code from here
 also im referencing other codes from other places because I'm using different components such as a analog joystick, slide potentiometer etc.
 
 here are the links im referencing
-- for knob functions : https://www.notion.so/midi-3d7e1cd3b45641999254624df3f391de#fb3c65681f5e41579676120b0cb622f5
+- for knob functions : https://learn.adafruit.com/grand-central-usb-midi-controller-in-circuitpython/code-usb-midi-in-circuitpython
 - for joysticks : https://www.tomshardware.com/how-to/raspberry-pi-pico-joystick
 
 ## What it does
